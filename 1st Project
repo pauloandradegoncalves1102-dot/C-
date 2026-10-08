@@ -1,0 +1,72 @@
+#include <WiFi.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_ILI9341.h>
+const char* ssid = "Wokwi-GUEST";
+const char* password = "";
+#define BTN_PIN 5
+#define TFT_DC 2
+#define TFT_CS 15
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+const char* paroleAmore[] = {
+  "Ti amo",
+  "Ti voglio bene",
+  "Amore mio",
+  "Tesoro",
+  "Vita mia",
+  "Mi manchi",
+  "Ti penso sempre",
+  "Cuore mio",
+  "Sei il mio sole",
+  "Ti scelgo ancora",
+  "Sei il mio sempre",
+  "Con te tutto ha senso",
+  "Il mio cuore e' tuo",
+  "Sei la mia felicita'",
+  "Ogni giorno ti amo di piu'",
+  "Sei il mio rifugio",
+  "Senza di te non sono nulla",
+  "Sei la parte migliore di me",
+  "Il tuo amore e' il mio porto",
+  "Ti amo piu' di ieri"
+};
+
+const int NUM_PAROLE = sizeof(paroleAmore) / sizeof(paroleAmore[0]);
+int indice = 0;
+void mostraParola() {
+  tft.fillScreen(ILI9341_BLACK);
+  tft.setCursor(0, 0);
+  tft.setTextSize(2);
+  tft.setTextColor(ILI9341_GREEN);
+  tft.println(paroleAmore[indice]);
+  tft.setTextSize(1);
+  tft.setTextColor(ILI9341_WHITE);
+  tft.setCursor(0, 40);
+  tft.print("[" + String(indice + 1) + "/" + String(NUM_PAROLE) + "]");
+  indice = (indice + 1) % NUM_PAROLE;
+}
+
+void setup() {
+  pinMode(BTN_PIN, INPUT_PULLUP);
+  WiFi.begin(ssid, password, 6);
+  tft.begin();
+  tft.setRotation(1);
+  tft.fillScreen(ILI9341_BLACK);
+  tft.setTextColor(ILI9341_WHITE);
+  tft.setTextSize(2);
+  tft.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(100);
+    tft.print(".");
+  }
+  tft.print("\nOK! IP=");
+  tft.println(WiFi.localIP());
+  mostraParola();
+}
+
+void loop() {
+  if (digitalRead(BTN_PIN) == LOW) {
+    delay(200);  // debounce
+    mostraParola();
+  }
+  delay(100);
+}   
